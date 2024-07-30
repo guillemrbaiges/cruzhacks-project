@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlit-deployment
+  labels:
+    app: streamlit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamlit
+  template:
+    metadata:
+      labels:
+        app: streamlit
+    spec:
+      serviceAccountName: unicron-job
+      containers:
+        - name: streamlit
+          image: containers.mpi-internal.com/ephemeral/guillem-rossello/prompt-eng:20240121060551-78f854b5
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8501
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+              scheme: HTTP
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+              scheme: HTTP
+            timeoutSeconds: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit-service
+spec:
+  type: ClusterIP
+  selector:
+    app: streamlit
+  ports:
+    - name: streamlit-port
+      protocol: TCP
+      port: 8501
+      targetPort: 8501

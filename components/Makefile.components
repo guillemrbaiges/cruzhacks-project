@@ -1,0 +1,5 @@
+include ../../Makefile.common
+
+.PHONY: components-build
+components-build: ## Build a single component. You must be on the component folder name
+	poetry run kfp-unicron components build

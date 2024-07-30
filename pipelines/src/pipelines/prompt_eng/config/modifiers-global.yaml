@@ -1,0 +1,16 @@
+__default__:
+
+  labels:
+    application_type: kubeflow_pipeline
+
+  repeat_on_failure:
+    num_retries: 3
+  
+  cache:
+    disabled: true
+
+deploy-model:
+  environment:
+    from_secrets:
+      - name: github-token-secret
+        key: GITHUB_TOKEN

@@ -1,0 +1,77 @@
+# This is a bare minimum configuration just overriding the default configuration that does not match our needs
+# see https://github.com/fiaas/fiaas-deploy-daemon/blob/master/docs/v3_spec.md for default values.
+apiVersion: fiaas.schibsted.io/v1
+kind: Application
+metadata:
+  labels:
+    fiaas/deployment_id: "${APP_VERSION}-${RANDOM_NUM}"
+    # this is a required field for fiaas-deploy-daemon that needs to be changed to trigger a deployment
+  annotations:
+  #  common-platform.io/ha: "true"
+  #   # To make it deployed in multiple clusters, see https://docs.mpi-internal.com/orka/rudder/#special-annotations.
+  #   # Unfortunately it causes ArgoCD to get different manifests in each get request
+  #   # from different clusters behind, that causes a flapping view in ArgoCD UI.
+  #   # Children resources of a FIAAS application appears/disappears constantly due to mismatching
+  #   # ownerReferences. And once ArgoCD gets a synced result from one of the backend clusters,
+  #   # it stops retries, but in other cluster there might have a situation that requires a retry.
+  #   # We disabled HA mode in this default example, since it's a safer choice.
+  name: ${APP_NAME}
+spec:
+  application: ${APP_NAME}
+  config:
+    annotations:
+      ingress:
+        # kubernetes.io/ingress.class: internal
+        kubernetes.io/ingress.class: heimdall
+        # nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+    ports:
+    - target_port: 8501
+    ## default values:
+    healthchecks:
+      liveness:
+        http:
+          path: /_stcore/health
+          port: 8501
+          scheme: HTTP
+        timeoutSeconds: 1
+      readiness:
+        http:
+          path: /_stcore/health
+          port: 8501
+          scheme: HTTP
+        timeoutSeconds: 1
+    # healthchecks:
+    #   liveness:
+    #     http:
+    #       path: /_/health
+    #       port: 8000
+    #   readiness:
+    #     http:
+    #       path: /_/ready
+    #       port: 8000
+    # metrics:
+    #   prometheus:
+    #     path: /_/metrics
+    #     port: 8000
+    ## SCHIP dev/pre namespaces have deny-notbesteffort quota prevents you setting resources
+    ## and in pro namespace have deny-besteffort quota prevents you put any pod without resources
+    ## So even you pass explicit resources here, you'll see they won't be applied in dev/pre namespaces
+    ## but only in pro namespace
+    ## default values:
+    # resources:
+    #   limits:
+    #     cpu: 400m
+    #     memory: 512Mi
+    #   requests:
+    #     cpu: 200m
+    #     memory: 256Mi
+    replicas: # autoscaling won't be enabled (no hpa will be created) in dev/pre namespaces in SCHIP due to not-allowed CPU requests
+      ## default values:
+      # minimum: 2
+      # maximum: 5
+      # cpu_threshold_percentage: 50
+      # singleton: true
+      singleton: false  # this is normally meaningful only you use 1 replicas, for model deployment
+                        # you wouldn't want downtime during a deployment, so wise to keep it false
+    version: 3
+  image: IMAGE

@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+
+env: 
+  EXCLUDED_PIPELINES: hello_world some_other_pipeline
+
+jobs:
+  set-deploy-env:
+    runs-on: size/small
+    outputs:
+      env: ${{ steps.set-env.outputs.env }}
+      excluded_pipelines: ${{ env.EXCLUDED_PIPELINES }}
+    steps:
+    - name: Set Unicron Gitops Environment
+      id: set-env
+      run: |
+        if [[ "${{ github.ref }}" =~ ^refs/pull/ ]]; then
+          echo "env=dev" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+          echo "env=pre" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+          echo "env=pro" >> $GITHUB_OUTPUT
+        else
+          echo "env=" >> $GITHUB_OUTPUT
+        fi
+
+  deploy:
+    uses: unicron/github-actions/.github/workflows/gitops-deploy.yaml@v1.3
+    needs: set-deploy-env
+    with:
+      env: ${{ needs.set-deploy-env.outputs.env }}
+      excluded_pipelines: ${{ needs.set-deploy-env.outputs.excluded_pipelines }}
+    secrets:
+      artifactory_user: ${{ secrets.ARTIFACTORY_USER }}
+      artifactory_pwd: ${{ secrets.ARTIFACTORY_PWD }}
+      gh_token: ${{ secrets.UNICRON_GITHUB_TOKEN }}
+      qg_reports_key: ${{ secrets.QUALITY_GATE_REPORTS_KEY }}
+      qg_reports_secret: ${{ secrets.QUALITY_GATE_REPORTS_SECRET }}
+      devhose_key: ${{ secrets.DEVHOSE_KEY }}

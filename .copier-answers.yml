@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier
+_commit: e25371f
+_src_path: https://github.mpi-internal.com/unicron/ml-bootstrap-template.git
+component_function_name: prompt_eng
+component_package_name: prompt-eng
+gitops_autocommit: true
+gitops_repo: rossello-kf
+organization: guillem-rossello
+pipeline_name: prompt_eng
+python_version: '3.9'

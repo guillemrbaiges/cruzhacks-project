@@ -1,0 +1,4 @@
+images:
+- group: fiaas.schibsted.io
+  kind: Application
+  path: spec/image

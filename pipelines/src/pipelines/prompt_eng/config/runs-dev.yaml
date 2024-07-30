@@ -1,0 +1,11 @@
+experiment_name: deploy-schip-experiment
+
+runs:
+  deploy_streamlit_app:
+    module: pipelines.prompt_eng.pipeline_deploy
+    pipeline_func: deploy_schip
+    parameters:
+      app_name: speech-quality-evaluator
+      app_version: 0.1.0
+      app_deployment_env: dev
+      app_serving_image: ${PROMPT_ENG_DOCKER_IMAGE}

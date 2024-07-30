@@ -1,0 +1,5 @@
+include ../../Makefile.common
+
+.PHONY: app-build
+app-build: ## Build a single application. You must be on the application folder name
+	poetry run kfp-unicron applications build $(PROJECT_NAME)

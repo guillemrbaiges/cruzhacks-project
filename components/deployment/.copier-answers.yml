@@ -1,0 +1,7 @@
+# Changes here will be overwritten by Copier
+_commit: 936fff9
+_src_path: https://github.mpi-internal.com/unicron/ml-components-template.git
+entrypoints: none
+organization: guillem-rossello
+package_name: deployment
+python_version: '3.9'

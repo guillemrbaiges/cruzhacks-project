@@ -1,0 +1,16 @@
+get-app-context:
+  local:
+    component_name: deployment
+    spec_file: get_app_context
+deploy-model:
+  artifact:
+    ephemeral: false
+    group: unicron/kfp-gitops-component
+    name: create_gitops_deploy
+    version: 0.3.8
+wait-argocd-sync:
+  artifact:
+    ephemeral: false
+    group: unicron/kfp-gitops-component
+    name: wait_argo_cd_sync
+    version: 0.3.8
